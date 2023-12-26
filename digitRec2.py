@@ -48,11 +48,11 @@ class DigitRecogniser:
         self.trnLabels = trnData[0]
         self.trnInputs = trnData[1:self.n]/255.
 
-        self.weights1 = np.random.rand(10, 784) -0.5 # Creates a 10row * 784col 2d array where each value is a random val between -0.5 and 0.5
-        self.biases1 = np.random.rand(10, 1) -0.5 # Bias vector
-        self.weights2 = np.random.rand(10, 10) -0.5 # Creates a 10row * 10col 2d array where each value is a random val between -0.5 and 0.5
-        self.biases2 = np.random.rand(10, 1) -0.5 # Bias vector
-        self.weights3 = np.random.rand(10, 10) -0.5
+        self.weights1 = np.random.rand(56, 784) -0.5 # Creates a 10row * 784col 2d array where each value is a random val between -0.5 and 0.5
+        self.biases1 = np.random.rand(56, 1) -0.5 # Bias vector
+        self.weights2 = np.random.rand(28, 56) -0.5 # Creates a 10row * 10col 2d array where each value is a random val between -0.5 and 0.5
+        self.biases2 = np.random.rand(28, 1) -0.5 # Bias vector
+        self.weights3 = np.random.rand(10, 28) -0.5
         self.biases3 = np.random.rand(10, 1) -0.5
     
     def relu(self, arr: np.array) -> np.array:
@@ -138,7 +138,7 @@ class DigitRecogniser:
         nonLinear1 = self.relu(linear1)
 
         linear2 = self.weights2.dot(nonLinear1) + self.biases2
-        nonLinear2 = self.sigmoid(linear2)
+        nonLinear2 = self.relu(linear2)
 
         linearOut = self.weights3.dot(nonLinear2) + self.biases3
         nonLinearOut = self.softmax(linearOut)
@@ -185,7 +185,7 @@ class DigitRecogniser:
         dW3 = (1/self.m) * dZ3.dot(A2.T)
         db3 = (1/self.m) * np.sum(dZ3)
 
-        dZ2 = self.weights3.T.dot(dZ3) * self.dSigmoid(Z2)
+        dZ2 = self.weights3.T.dot(dZ3) * self.dRelu(Z2)
         dW2 = (1/self.m) * dZ2.dot(A1.T)
         db2 = (1/self.m) * np.sum(dZ2)
 
@@ -224,7 +224,7 @@ class DigitRecogniser:
 
 if __name__ == "__main__":
     filePath = 'data/train.csv'
-    network = DigitRecogniser(filePath, 500, 0.2)
+    network = DigitRecogniser(filePath, 500, 0.1)
     network.gradientDesc()
 
     # Checking against validation data
