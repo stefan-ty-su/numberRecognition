@@ -39,17 +39,17 @@ class DigitRecogniser:
         self.m, self.n = self.data.shape # m is the number of observations, n is the number of features + 1 (label)
         np.random.shuffle(self.data)
 
-        vldData = self.data[0:1000].T
+        vldData = self.data[0:50].T
         self.vldLabels = vldData[0]
         self.vldInputs = vldData[1:self.n]/255.
 
-        trnData = self.data[1000:self.m].T
+        trnData = self.data[50:self.m].T
         self.trnLabels = trnData[0]
         self.trnInputs = trnData[1:self.n]/255.
 
-        self.weights1 = np.random.rand(10, 784) -0.5 # Creates a 10row * 784col 2d array where each value is a random val between -0.5 and 0.5
-        self.biases1 = np.random.rand(10, 1) -0.5# Bias vector
-        self.weights2 = np.random.rand(10, 10) -0.5# Creates a 10row * 784col 2d array where each value is a random val between -0.5 and 0.5
+        self.weights1 = np.random.rand(14, 784) -0.5 # Creates a 10row * 784col 2d array where each value is a random val between -0.5 and 0.5
+        self.biases1 = np.random.rand(14, 1) -0.5# Bias vector
+        self.weights2 = np.random.rand(10, 14) -0.5# Creates a 10row * 784col 2d array where each value is a random val between -0.5 and 0.5
         self.biases2 = np.random.rand(10, 1) -0.5# Bias vector
     
     def activate(self, arr: np.array) -> np.array:
@@ -121,7 +121,7 @@ class DigitRecogniser:
         Returns:
         np.array -- one hot encoded np.array
         """
-        oneHotLabels = np.zeros((labels.size, labels.max()+1))
+        oneHotLabels = np.zeros((labels.size, 10))
         oneHotLabels[np.arange(labels.size), labels] = 1
         oneHotLabels = oneHotLabels.T
         return oneHotLabels
@@ -181,10 +181,17 @@ class DigitRecogniser:
             
 
 if __name__ == "__main__":
-    filePath = 'data/train.csv'
-    network = DigitRecogniser(filePath, 500, 0.1)
+    filePath = 'data/custom.csv'
+    network = DigitRecogniser(filePath, 1000, 0.1)
     network.gradientDesc()
 
     # Checking against validation data
     _, _, _, output = network.forwardProp(network.vldInputs)
     print(f'Accuracy on Validation Set: {getAccuracy(getPredictions(output), network.vldLabels)}')
+
+    data = np.array(pd.read_csv('test.csv'))
+    data = data.T
+    inputs = data[1:]/255
+    print(inputs.shape)
+    _, _, _, output = network.forwardProp(inputs)
+    print(f'{getPredictions(output)}')
