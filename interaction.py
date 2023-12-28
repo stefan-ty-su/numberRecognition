@@ -42,7 +42,7 @@ def draw():
 
 def saveImageIntoCSV(label, gridArr: list[list[Tile]]) -> None:
     length = len(gridArr)
-    with open('test.csv', 'a', newline='') as file:
+    with open('data/test.csv', 'a', newline='') as file:
         writer = csv.writer(file)
         newRow = [gridArr[i][j].state for j in range(length) for i in range(length)]
         newRow.insert(0, label)
