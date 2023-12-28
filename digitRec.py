@@ -189,16 +189,19 @@ class DigitRecogniser:
             if i % 50 == 0:
                 print(f'Iteration: {i}')
                 print(f'Accuracy: {getAccuracy(getPredictions(nlinear2), self.trnLabels)}')
+    
+        self.checkValidation()
             
+    def checkValidation(self) -> None:
+        # Checking against validation data
+        _, _, _, output = self.forwardProp(self.vldInputs)
+        print(f'Accuracy on Validation Set: {getAccuracy(getPredictions(output), self.vldLabels)}')
+
 
 if __name__ == "__main__":
     filePath = 'data/custom.csv'
     network = DigitRecogniser(filePath, 14, 1000, 0.1)
     network.gradientDesc()
-
-    # Checking against validation data
-    _, _, _, output = network.forwardProp(network.vldInputs)
-    print(f'Accuracy on Validation Set: {getAccuracy(getPredictions(output), network.vldLabels)}')
 
     data = np.array(pd.read_csv('data/test.csv'))
     data = data.T

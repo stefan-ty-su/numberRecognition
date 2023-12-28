@@ -232,13 +232,15 @@ class DigitRecogniser2:
             if i % 50 == 0:
                 print(f'Iteration: {i}')
                 print(f'Accuracy: {getAccuracy(getPredictions(nlinear3), self.trnLabels)}')
+        self.checkValidation()
+            
+    def checkValidation(self) -> None:
+        # Checking against validation data
+        _, _, _, _, _, output = self.forwardProp(self.vldInputs)
+        print(f'Accuracy on Validation Set: {getAccuracy(getPredictions(output), self.vldLabels)}')
             
 
 if __name__ == "__main__":
     filePath = 'data/train.csv'
     network = DigitRecogniser2(filePath, 20, 10, 500, 0.1)
     network.gradientDesc()
-
-    # Checking against validation data
-    _, _, _, _, _, output = network.forwardProp(network.vldInputs)
-    print(f'Accuracy on Validation Set: {getAccuracy(getPredictions(output), network.vldLabels)}')
