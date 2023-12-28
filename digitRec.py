@@ -30,8 +30,19 @@ def getAccuracy(predictions: np.array, labels: np.array) -> float:
 
 class DigitRecogniser:
 
-    def __init__(self, filePath: str, iterations: int, alpha: int) -> None:
+    def __init__(self, filePath: str, numberOfNodes: int, iterations: int, alpha: int) -> None:
+        """
+        Digit Recogniser class, creates a neural network with 1 hidden layer
 
+        Arguments:
+        filepath -- path of the file for training data 
+        numberOfNodes -- determines the number of nodes in the hidden layer
+        iterations -- number of training iterations
+        alpha -- learning rate of the neural network
+
+        Returns:
+        None
+        """
         self.iterations = iterations
         self.alpha = alpha
 
@@ -39,17 +50,17 @@ class DigitRecogniser:
         self.m, self.n = self.data.shape # m is the number of observations, n is the number of features + 1 (label)
         np.random.shuffle(self.data)
 
-        vldData = self.data[0:50].T
+        vldData = self.data[0:self.m//40].T
         self.vldLabels = vldData[0]
         self.vldInputs = vldData[1:self.n]/255.
 
-        trnData = self.data[50:self.m].T
+        trnData = self.data[self.m//40:self.m].T
         self.trnLabels = trnData[0]
         self.trnInputs = trnData[1:self.n]/255.
 
-        self.weights1 = np.random.rand(14, 784) -0.5 # Creates a 10row * 784col 2d array where each value is a random val between -0.5 and 0.5
-        self.biases1 = np.random.rand(14, 1) -0.5# Bias vector
-        self.weights2 = np.random.rand(10, 14) -0.5# Creates a 10row * 784col 2d array where each value is a random val between -0.5 and 0.5
+        self.weights1 = np.random.rand(numberOfNodes, 784) -0.5 # Creates a 10row * 784col 2d array where each value is a random val between -0.5 and 0.5
+        self.biases1 = np.random.rand(numberOfNodes, 1) -0.5# Bias vector
+        self.weights2 = np.random.rand(10, numberOfNodes) -0.5# Creates a 10row * 784col 2d array where each value is a random val between -0.5 and 0.5
         self.biases2 = np.random.rand(10, 1) -0.5# Bias vector
     
     def activate(self, arr: np.array) -> np.array:
@@ -182,14 +193,14 @@ class DigitRecogniser:
 
 if __name__ == "__main__":
     filePath = 'data/custom.csv'
-    network = DigitRecogniser(filePath, 1000, 0.1)
+    network = DigitRecogniser(filePath, 14, 1000, 0.1)
     network.gradientDesc()
 
     # Checking against validation data
     _, _, _, output = network.forwardProp(network.vldInputs)
     print(f'Accuracy on Validation Set: {getAccuracy(getPredictions(output), network.vldLabels)}')
 
-    data = np.array(pd.read_csv('test.csv'))
+    data = np.array(pd.read_csv('data/test.csv'))
     data = data.T
     inputs = data[1:]/255
     print(inputs.shape)

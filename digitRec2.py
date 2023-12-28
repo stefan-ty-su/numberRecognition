@@ -29,10 +29,22 @@ def getAccuracy(predictions: np.array, labels: np.array) -> float:
     """
     return np.sum(predictions == labels) / labels.size
 
-class DigitRecogniser:
+class DigitRecogniser2:
 
-    def __init__(self, filePath: str, iterations: int, alpha: int) -> None:
+    def __init__(self, filePath: str, layer1nodes: int, layer2nodes: int, iterations: int, alpha: int) -> None:
+        """
+        Digit Recogniser class, creates a neural network with 2 hidden layers
 
+        Arguments:
+        filepath -- path of the file for training data 
+        layer1nodes -- determines the number of nodes in first hidden layer
+        layer2nodes -- determines the number of nodes in the second hidden layer
+        iterations -- number of training iterations
+        alpha -- learning rate of the neural network
+
+        Returns:
+        None
+        """
         self.iterations = iterations
         self.alpha = alpha
 
@@ -40,19 +52,19 @@ class DigitRecogniser:
         self.m, self.n = self.data.shape # m is the number of observations, n is the number of features + 1 (label)
         np.random.shuffle(self.data)
 
-        vldData = self.data[0:1000].T
+        vldData = self.data[0:self.m//40].T
         self.vldLabels = vldData[0]
         self.vldInputs = vldData[1:self.n]/255.
 
-        trnData = self.data[1000:self.m].T
+        trnData = self.data[self.m//40:self.m].T
         self.trnLabels = trnData[0]
         self.trnInputs = trnData[1:self.n]/255.
 
-        self.weights1 = np.random.rand(56, 784) -0.5 # Creates a 10row * 784col 2d array where each value is a random val between -0.5 and 0.5
-        self.biases1 = np.random.rand(56, 1) -0.5 # Bias vector
-        self.weights2 = np.random.rand(28, 56) -0.5 # Creates a 10row * 10col 2d array where each value is a random val between -0.5 and 0.5
-        self.biases2 = np.random.rand(28, 1) -0.5 # Bias vector
-        self.weights3 = np.random.rand(10, 28) -0.5
+        self.weights1 = np.random.rand(layer1nodes, 784) -0.5 # Creates a 10row * 784col 2d array where each value is a random val between -0.5 and 0.5
+        self.biases1 = np.random.rand(layer1nodes, 1) -0.5 # Bias vector
+        self.weights2 = np.random.rand(layer2nodes, layer1nodes) -0.5 # Creates a 10row * 10col 2d array where each value is a random val between -0.5 and 0.5
+        self.biases2 = np.random.rand(layer2nodes, 1) -0.5 # Bias vector
+        self.weights3 = np.random.rand(10, layer2nodes) -0.5
         self.biases3 = np.random.rand(10, 1) -0.5
     
     def relu(self, arr: np.array) -> np.array:
@@ -224,7 +236,7 @@ class DigitRecogniser:
 
 if __name__ == "__main__":
     filePath = 'data/train.csv'
-    network = DigitRecogniser(filePath, 500, 0.1)
+    network = DigitRecogniser2(filePath, 20, 10, 500, 0.1)
     network.gradientDesc()
 
     # Checking against validation data
